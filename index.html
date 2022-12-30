@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="node_modules/milligram/dist/milligram.min.css" />
+        <style>
+            .container {
+                margin-top: 100px;
+            }
+
+            input[type="file"] {
+                display: none;
+            }
+
+            .file-upload {
+                border: 1px dashed #ccc;
+                display: inline-block;
+                padding: 6px 6px;
+                cursor: pointer;
+                width: 100%;
+                text-align: center;
+            }
+
+            .dragging .file-upload {
+                background-color: rgb(176, 175, 206);
+            }
+
+            .file-upload > h1 {
+                margin-bottom: 0px;
+                line-height: 200px;
+                height: 200px;
+            }
+
+            .image-item {
+                border: 1px dashed #ccc;
+                height: 100px;
+                width: 100px;
+                display: inline-block;
+                margin-right: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="column">
+                    <label for="file-upload" class="file-upload" id="drop-zone">
+                        <h1>Upload or Drag Image</h1>
+                    </label>
+                    <input id="file-upload" type="file" accept="image/jpeg, image/png, image/jpg"/>
+                </div>
+            </div>
+          
+            <div class="row">
+                <div class="column" id="image-box"></div>
+            </div>
+    
+          </div>
+          
+          <script type="module" src="index.js"></script>
+    </body>
+</html>
+

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@imagemagick/magick-wasm": "^0.0.18",
+    "milligram": "^1.4.1"
+  }
+}
