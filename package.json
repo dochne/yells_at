@@ -2,5 +2,8 @@
   "dependencies": {
     "@imagemagick/magick-wasm": "^0.0.18",
     "milligram": "^1.4.1"
+  },
+  "scripts": {
+    "cp": "npm install && cp node_modules/@imagemagick/magick-wasm/dist/index.mjs dist/magick.mjs && cp node_modules/milligram/dist/milligram.min.css dist/milligram.min.css"
   }
 }

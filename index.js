@@ -4,7 +4,7 @@ import {
     MagickGeometry,
     CompositeOperator,
     Point,
-} from './node_modules/@imagemagick/magick-wasm/dist/index.mjs';
+} from './dist/magick.mjs';
 
 const memoize = (() => {
     const cache = {};
