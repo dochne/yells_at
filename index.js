@@ -24,6 +24,10 @@ async function encode(data) {
     });
 }
 
+async function decode(dataUrl) {
+    return new Uint8Array(await (await fetch(dataUrl)).arrayBuffer());
+}
+
 async function loadOverlay(filename) {
     return memoize(filename, async () => {
         return new Uint8Array(await (await fetch(filename)).arrayBuffer());
@@ -32,7 +36,13 @@ async function loadOverlay(filename) {
 
 async function transformImage(content, filename)
 {
+    const imageItem = document.createElement("a");
+    imageItem.className = "image-item spinner";
+    imageItem.download = "yells_at_" + (filename ?? '.png');
+    document.getElementById("image-box").appendChild(imageItem);
+
     await initializeImageMagick()
+
     const overlay = await loadOverlay("yells_at.png");
     
     ImageMagick.read(content, (image) => {
@@ -41,22 +51,42 @@ async function transformImage(content, filename)
             overlayImage.composite(image, CompositeOperator.Over, new Point(10, 0));
                 
             overlayImage.write(async data => {
-                // const link = document.createElement("a");
-                
-
                 const elem = document.createElement("img");
                 elem.src = await encode(data);
-    
-                const imageItem = document.createElement("a");
-                imageItem.className = "image-item";
-                imageItem.download = "yells_at_" + filename;
                 imageItem.href = elem.src;
-    
+                imageItem.classList.remove("spinner");
                 imageItem.appendChild(elem);
-                document.getElementById("image-box").appendChild(imageItem);
             });
         });
     });
+}
+
+async function getAsString(item)
+{
+    return new Promise((resolve) => {
+        item.getAsString((str) => {
+            console.log("Resolve", str);
+            resolve(str);
+        });
+    });
+    
+}
+
+async function getDataTransferItemAsBuffer(items)
+{
+    let item = undefined;
+
+    if (item = items.find((item) => item.kind === 'file')) {
+        return new Uint8Array(await item.getAsFile().arrayBuffer());
+    } else if (item = items.find((item) => item.kind == 'string' && item.type === 'text/uri-list')) {
+        const str = await getAsString(item);
+
+        if (str.indexOf("data:") === 0) {
+            return await decode(str);
+        }
+    }
+
+    return undefined;
 }
 
 async function dropHandler(ev) {
@@ -66,18 +96,12 @@ async function dropHandler(ev) {
     document.body.classList.remove("dragging");
   
     if (ev.dataTransfer.items) {
-      [...ev.dataTransfer.items].forEach(async (item, i) => {
-        if (item.kind === 'file') {
-          const file = item.getAsFile();
-          transformImage(new Uint8Array(await file.arrayBuffer()), file.name);
+        const buffer = await getDataTransferItemAsBuffer([...ev.dataTransfer.items]);
+        if (buffer) {
+            transformImage(buffer);
         }
-      });
     } else {
         console.error("Not handling this")
-      // Use DataTransfer interface to access the file(s)
-    //   [...ev.dataTransfer.files].forEach((file, i) => {
-    //     console.log(`… file[${i}].name = ${file.name}`);
-    //   });
     }
   }
 
