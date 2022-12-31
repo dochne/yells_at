@@ -124,3 +124,16 @@ fileUpload.addEventListener("change", function() {
 const dropZone = document.getElementById("drop-zone");
 dropZone.ondrop = dropHandler;
 dropZone.ondragover = dragOverHandler;
+
+
+async function pasteEvent(ev) {
+    const buffer = await getDataTransferItemAsBuffer([...ev.clipboardData.items]);
+    if (buffer) {
+        transformImage(buffer);
+    }
+
+    ev.preventDefault();
+  }
+
+document.onpaste = pasteEvent;
+
