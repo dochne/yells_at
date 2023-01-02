@@ -2,6 +2,7 @@ import {
     initializeImageMagick,
     ImageMagick,
     MagickGeometry,
+    MagickFormat,
     CompositeOperator,
     Point,
 } from './dist/magick.mjs';
@@ -17,11 +18,13 @@ const memoize = (() => {
 })();
 
 async function encode(data) {
-    return await new Promise((r) => {
+    const octet_stream = await new Promise((r) => {
         const reader = new FileReader()
         reader.onload = () => r(reader.result)
         reader.readAsDataURL(new Blob([data]))
     });
+
+    return octet_stream.replace("application/octet-stream", "image/png");
 }
 
 async function decode(dataUrl) {
@@ -34,11 +37,10 @@ async function loadOverlay(filename) {
     });
 }
 
-async function transformImage(content, filename)
+async function transformImage(content)
 {
-    const imageItem = document.createElement("a");
+    const imageItem = document.createElement("div");
     imageItem.className = "image-item spinner";
-    imageItem.download = "yells_at_" + (filename ?? '.png');
     document.getElementById("image-box").appendChild(imageItem);
 
     await initializeImageMagick()
@@ -56,7 +58,7 @@ async function transformImage(content, filename)
                 imageItem.href = elem.src;
                 imageItem.classList.remove("spinner");
                 imageItem.appendChild(elem);
-            });
+            }, MagickFormat.Png);
         });
     });
 }
@@ -116,7 +118,7 @@ const fileUpload = document.querySelector("#file-upload")
 fileUpload.addEventListener("change", function() {
     const reader = new FileReader()
     reader.addEventListener("load", () => {
-        transformImage(new Uint8Array(reader.result, this.files[0].name));
+        transformImage(new Uint8Array(reader.result));
     })
     reader.readAsArrayBuffer(this.files[0])
 })
@@ -136,4 +138,3 @@ async function pasteEvent(ev) {
   }
 
 document.onpaste = pasteEvent;
-
